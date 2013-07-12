@@ -214,4 +214,14 @@ public interface IccCard {
      * @return true if a ICC card is present
      */
     public boolean hasIccCard();
+
+    public void exchangeAPDU(int cla, int command, int channel, int p1, int p2,
+            int p3, String data, Message onComplete);
+
+    public void openLogicalChannel(String AID, Message onComplete);
+
+    public void closeLogicalChannel(int channel, Message onComplete);
+    
+	public void exchangeSimIO(int fileID, int command,
+                              int p1, int p2, int p3, String pathID, Message onComplete);    
 }

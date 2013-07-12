@@ -2219,6 +2219,10 @@ public final class RIL extends BaseCommands implements CommandsInterface {
             case RIL_REQUEST_SEND_SMS_EXPECT_MORE: ret =  responseSMS(p); break;
             case RIL_REQUEST_SETUP_DATA_CALL: ret =  responseSetupDataCall(p); break;
             case RIL_REQUEST_SIM_IO: ret =  responseICC_IO(p); break;
+            case RIL_REQUEST_SIM_TRANSMIT_BASIC: ret =  responseICC_IO(p); break;
+            case RIL_REQUEST_SIM_OPEN_CHANNEL: ret  = responseInts(p); break;
+            case RIL_REQUEST_SIM_CLOSE_CHANNEL: ret  = responseVoid(p); break;
+            case RIL_REQUEST_SIM_TRANSMIT_CHANNEL: ret = responseICC_IO(p); break;
             case RIL_REQUEST_SEND_USSD: ret =  responseVoid(p); break;
             case RIL_REQUEST_CANCEL_USSD: ret =  responseVoid(p); break;
             case RIL_REQUEST_GET_CLIR: ret =  responseInts(p); break;
@@ -3488,6 +3492,10 @@ public final class RIL extends BaseCommands implements CommandsInterface {
             case RIL_REQUEST_SEND_SMS_EXPECT_MORE: return "SEND_SMS_EXPECT_MORE";
             case RIL_REQUEST_SETUP_DATA_CALL: return "SETUP_DATA_CALL";
             case RIL_REQUEST_SIM_IO: return "SIM_IO";
+            case RIL_REQUEST_SIM_TRANSMIT_BASIC: return "SIM_TRANSMIT_BASIC";
+            case RIL_REQUEST_SIM_OPEN_CHANNEL: return "SIM_OPEN_CHANNEL";
+            case RIL_REQUEST_SIM_CLOSE_CHANNEL: return "SIM_CLOSE_CHANNEL";
+            case RIL_REQUEST_SIM_TRANSMIT_CHANNEL: return "SIM_TRANSMIT_CHANNEL";
             case RIL_REQUEST_SEND_USSD: return "SEND_USSD";
             case RIL_REQUEST_CANCEL_USSD: return "CANCEL_USSD";
             case RIL_REQUEST_GET_CLIR: return "GET_CLIR";
@@ -3874,5 +3882,64 @@ public final class RIL extends BaseCommands implements CommandsInterface {
         }
         pw.println(" mLastNITZTimeInfo=" + mLastNITZTimeInfo);
         pw.println(" mTestingEmergencyCall=" + mTestingEmergencyCall.get());
+    }
+
+    public void
+    iccExchangeAPDU(int cla, int command, int channel, int p1, int p2, int p3,
+            String data, Message result) {
+        RILRequest rr;
+        if (channel == 0) {
+            rr = RILRequest.obtain(RIL_REQUEST_SIM_TRANSMIT_BASIC, result);
+        } else {
+            rr = RILRequest.obtain(RIL_REQUEST_SIM_TRANSMIT_CHANNEL, result);
+        }
+
+        rr.mp.writeInt(cla);
+        rr.mp.writeInt(command);
+        rr.mp.writeInt(channel);
+        rr.mp.writeString(null);
+        rr.mp.writeInt(p1);
+        rr.mp.writeInt(p2);
+        rr.mp.writeInt(p3);
+        rr.mp.writeString(data);
+        rr.mp.writeString(null);
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> iccExchangeAPDU: " + requestToString(rr.mRequest)
+                + "Channel 0x" + Integer.toHexString(channel) + ": "
+                + " 0x" + Integer.toHexString(cla)
+                + " 0x" + Integer.toHexString(command)
+                + " 0x" + Integer.toHexString(p1)
+                + " 0x" + Integer.toHexString(p2)
+                + " 0x" + Integer.toHexString(p3)
+                );
+
+        send(rr);
+    }
+
+    public void
+    iccOpenChannel(String AID, Message result) {
+        RILRequest rr
+                = RILRequest.obtain(RIL_REQUEST_SIM_OPEN_CHANNEL, result);
+
+        rr.mp.writeString(AID);
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> iccOpenChannel: " + requestToString(rr.mRequest)
+                + " " + AID);
+
+        send(rr);
+    }
+
+    public void
+    iccCloseChannel(int channel, Message result) {
+        RILRequest rr
+                = RILRequest.obtain(RIL_REQUEST_SIM_CLOSE_CHANNEL, result);
+    
+        rr.mp.writeInt(1);
+        rr.mp.writeInt(channel);
+
+        if (RILJ_LOGD) riljLog(rr.serialString() + "> iccCloseChannel: " + requestToString(rr.mRequest)
+                + " " + channel);
+
+        send(rr);
     }
 }

@@ -1144,6 +1144,18 @@ public interface CommandsInterface {
 
     void setNetworkSelectionModeManual(String operatorNumeric, Message response);
 
+
+    /**
+     * SmartCard API related exports
+     */
+    void iccExchangeAPDU(int cla, int command, int channel, int p1, int p2,
+            int p3, String data, Message response);
+
+    void iccOpenChannel(String AID, Message response);
+
+    void iccCloseChannel(int channel, Message response);
+
+
     /**
      * Queries whether the current network selection mode is automatic
      * or manual

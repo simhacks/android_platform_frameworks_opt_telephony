@@ -735,4 +735,38 @@ public class IccCardProxy extends Handler implements IccCard {
 
         pw.flush();
     }
+
+    public void exchangeAPDU(int cla, int command, int channel, int p1, int p2,
+            int p3, String data, Message onComplete) {
+        synchronized (mLock) {
+            if (mUiccApplication != null) {
+                mUiccApplication.exchangeAPDU(cla,command,channel,p1,p2,p3,data,onComplete);
+            }         
+		}
+    }
+
+    public void openLogicalChannel(String AID, Message onComplete) {
+        synchronized (mLock) {
+            if (mUiccApplication != null) {
+                mUiccApplication.openLogicalChannel(AID,onComplete);
+            }         
+		}
+	}
+    
+    public void closeLogicalChannel(int channel, Message onComplete) {
+        synchronized (mLock) {
+            if (mUiccApplication != null) {
+                mUiccApplication.closeLogicalChannel(channel,onComplete);
+            }         
+		}
+    }
+    
+    public void exchangeSimIO(int fileID, int command,
+                                           int p1, int p2, int p3, String pathID, Message onComplete) {
+        synchronized (mLock) {
+            if (mUiccApplication != null) {
+				mUiccApplication.exchangeSimIO(fileID,command,p1,p2,p3,pathID,onComplete);
+			}
+		}
+	}    
 }
